@@ -47,6 +47,13 @@ async function handler(req, res) {
     jobs = jobs.filter((job) => job);
   } else {
     jobs = await queue[`get${_.capitalize(state)}`](startId, endId);
+
+    jobs = jobs.map(job => {
+        if (job.delay) {
+          job.runAt = job.timestamp + job.delay;
+        }
+        return job;
+    });
   }
 
   let pages = _.range(page - 6, page + 7)

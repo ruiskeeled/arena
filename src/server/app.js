@@ -4,6 +4,22 @@ const bodyParser = require('body-parser');
 const handlebars = require('handlebars');
 const exphbs = require('express-handlebars');
 
+const loadConfigFromEnv = () => {
+  "use strict";
+  const queues = [];
+
+  if (process.env.REDIS_URL && process.env.QUEUES) {
+    const queusList = process.env.QUEUES.split(',');
+
+    queusList.forEach(queue => {
+      queues.push({name: queue, url: process.env.REDIS_URL, hostId: "skeeled"});
+      console.log(`Loaded queues: ${queue}`);
+    });
+  }
+
+  return queues;
+};
+
 module.exports = function() {
   const hbs = exphbs.create({
     defaultLayout: `${__dirname}/views/layout`,
@@ -17,7 +33,10 @@ module.exports = function() {
 
   const app = express();
 
+  const enviromentConfig = loadConfigFromEnv();
   const defaultConfig = require(path.join(__dirname, 'config', 'index.json'));
+
+  defaultConfig.queues = enviromentConfig.length > 0 ? enviromentConfig : defaultConfig.queues;
 
   const Queues = require('./queue');
   app.locals.Queues = new Queues(defaultConfig);

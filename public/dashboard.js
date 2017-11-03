@@ -5,6 +5,31 @@ $(document).ready(() => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
+    // Set up individual "retry job" handler
+    $('.js-promote-job').on('click', function(e) {
+        e.preventDefault();
+        $(this).prop('disabled', true);
+
+        const jobId = $(this).data('job-id');
+        const queueName = $(this).data('queue-name');
+        const queueHost = $(this).data('queue-host');
+
+        const r = window.confirm(`Retry job #${jobId} in queue "${queueHost}/${queueName}"?`);
+        if (r) {
+            $.ajax({
+                method: 'PATCH',
+                url: `${basePath}/api/queue/${encodeURIComponent(queueHost)}/${encodeURIComponent(queueName)}/job/${encodeURIComponent(jobId)}/promote`
+            }).done(() => {
+                window.location.reload();
+            }).fail((jqXHR) => {
+                window.alert(`Request failed, check console for error.`);
+                console.error(jqXHR.responseText);
+            });
+        } else {
+            $(this).prop('disabled', false);
+        }
+    });
+
   // Set up individual "retry job" handler
   $('.js-retry-job').on('click', function(e) {
     e.preventDefault();
@@ -114,6 +139,9 @@ $(document).ready(() => {
 
     const r = window.confirm(`${capitalize(action)} ${data.jobs.length} ${data.jobs.length > 1 ? 'jobs' : 'job'} in queue "${queueHost}/${queueName}"?`);
     if (r) {
+      if (action === 'promote') {
+        window.alert('Bulk actions not supported for promote operations');
+      }
       $.ajax({
         method: action === 'remove' ? 'POST' : 'PATCH',
         url: `${basePath}/api/queue/${encodeURIComponent(queueHost)}/${encodeURIComponent(queueName)}/job/bulk`,

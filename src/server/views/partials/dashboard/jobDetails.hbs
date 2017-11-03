@@ -13,6 +13,12 @@
   </button>
 {{/eq}}
 
+{{#eq jobState 'delayed'}}
+    <button class="btn btn-success js-promote-job" data-queue-host="{{ queueHost }}" data-queue-name="{{ queueName }}" data-job-id="{{ this.id }}">
+        Promote
+    </button>
+{{/eq}}
+
 <div class="row">
   <div class="col-sm-3">
     <h5>State</h5>
@@ -28,6 +34,16 @@
       {{moment this.timestamp "llll"}}
     {{/if}}
   </div>
+
+    <div class="col-sm-3">
+        <h5>Run at</h5>
+        {{#if this.options.runAt}}
+            {{moment this.options.runAt "llll"}}
+        {{/if}}
+        {{#if this.runAt}}
+            {{moment this.runAt "llll"}}
+        {{/if}}
+    </div>
 
   <div class="col-sm-3">
     <h5>Attempts Made</h5>

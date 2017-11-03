@@ -2,6 +2,7 @@ const _ = require('lodash');
 const util = require('util');
 
 async function handler(req, res) {
+
   const { queueName, queueHost, id } = req.params;
   const { json } = req.query;
 
@@ -22,6 +23,10 @@ async function handler(req, res) {
     jobState = job.status;
   } else {
     jobState = await job.getState();
+  }
+
+  if (job.delay) {
+    job.runAt = job.timestamp + job.delay;
   }
 
   return res.render('dashboard/templates/jobDetails', {
