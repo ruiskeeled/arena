@@ -45,6 +45,16 @@
         {{/if}}
     </div>
 
+    <div class="col-sm-3">
+        <h5>Processed at</h5>
+        {{#if this.options.processedOn}}
+            {{moment this.options.processedOn "llll"}}
+        {{/if}}
+        {{#if this.processedOn}}
+            {{moment this.processedOn "llll"}}
+        {{/if}}
+    </div>
+
   <div class="col-sm-3">
     <h5>Attempts Made</h5>
     {{this.attemptsMade}}
